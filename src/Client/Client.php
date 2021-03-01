@@ -21,6 +21,11 @@ class Client
     private $collectiveSoapClient;
 
     /**
+     * @var array
+     */
+    private $soapOptions = [];
+
+    /**
      * @var string
      */
     private $username;
@@ -35,15 +40,18 @@ class Client
      * @param SoapClient $collectiveSoapClient
      * @param string $username
      * @param string $password
+     * @param array $soapOptions
      */
     public function __construct(
         SoapClient $authSoapClient,
         SoapClient $collectiveSoapClient,
         string $username,
-        string $password
+        string $password,
+        array $soapOptions = []
     ) {
         $this->authSoapClient = $authSoapClient;
         $this->collectiveSoapClient = $collectiveSoapClient;
+        $this->soapOptions = $soapOptions;
         $this->username = $username;
         $this->password = $password;
     }
@@ -53,7 +61,8 @@ class Client
      */
     public function getAuthSoapClient()
     {
-        return $this->authSoapClient;
+        return $this->authSoapClient
+            ->setOptions($this->getSoapOptions());
     }
 
     /**
@@ -61,7 +70,24 @@ class Client
      */
     public function getCollectiveSoapClient()
     {
-        return $this->collectiveSoapClient;
+        return $this->collectiveSoapClient
+            ->setOptions($this->getSoapOptions());
+    }
+
+    /**
+     * @return array
+     */
+    public function getSoapOptions()
+    {
+        return $this->soapOptions;
+    }
+
+    /**
+     * @param array $soapOptions
+     */
+    public function setSoapOptions(array $soapOptions)
+    {
+        $this->soapOptions = $soapOptions;
     }
 
     /**

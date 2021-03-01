@@ -34,6 +34,9 @@ class ClientTest extends BartecTestCase
     public function setUp(): void
     {
         $this->mockSoapClient = $this->createMock(SoapClient::class);
+        $this->mockSoapClient
+            ->method('setOptions')
+            ->willReturn($this->mockSoapClient);
         $this->bartecClient = new BartecClient($this->mockSoapClient, $this->mockSoapClient, 'u', 'p');
         $this->soapResponse = new SoapResponse();
         $this->mockSoapResult = new \stdClass();
