@@ -1,12 +1,14 @@
 {
   "name": "lb-hounslow/bartec",
-  "description": "A client for the Bartec Collective API v15 SOAP Web Service",
+  "description": "A client and basic service for the Bartec Collective API v15 SOAP Web Service",
   "type": "library",
   "license": "proprietary",
   "require": {
-    "php": "^7.2",
+    "php": ">=7.4.2",
     "ext-json": "*",
-    "ext-soap": "*"
+    "ext-soap": "*",
+    "psr/cache": "^1.0",
+    "symfony/cache": "^5.3"
   },
   "autoload": {
     "psr-4": {
@@ -16,7 +18,8 @@
   "autoload-dev": {
     "psr-4": {
       "Tests\\": "tests/",
-      "Tests\\Unit\\": "tests/unit/"
+      "Tests\\Unit\\": "tests/unit/",
+      "Tests\\Functional\\": "tests/functional/"
     }
   },
   "require-dev": {
