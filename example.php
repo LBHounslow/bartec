@@ -1,15 +1,19 @@
 <?php
 require_once 'vendor/autoload.php';
 
+use Bartec\Exception\SoapException;
 use Bartec\Client\Client as BartecClient;
 use Bartec\Client\SoapClient;
-use Bartec\Exception\SoapException;
+use Bartec\Response\Response;
+use Bartec\Service\BartecService;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
+// BARTEC CLIENT USAGE
 $bartecClient = new BartecClient(
     new SoapClient(BartecClient::WSDL_AUTH),
-    new SoapClient(BartecClient::WSDL_COLLECTIVE_API),
-    'BARTEC_USERNAME',
-    'BARTEC_PASSWORD'
+    new SoapClient(BartecClient::WSDL_COLLECTIVE_API_V15),
+    'BARTEC_API_USERNAME',
+    'BARTEC_API_PASSWORD'
 );
 
 // Fetch a token
@@ -38,3 +42,20 @@ try {
     $exception = $e->getResponse()->getException(); // SoapClients \Exception if thrown  or NULL
     $error = $e->getResponse()->getErrorMessage();  // Bartec's $result->Errors->Error->Message OR $result->Errors->Message if available or NULL
 }
+
+// BARTEC SERVICE USAGE
+/** @var BartecService $bartecService */
+$bartecService = new BartecService(
+    $bartecClient,
+    new FilesystemAdapter('Tests-functional-Service', BartecService::CACHE_LIFETIME) // Any cache library implementing Psr\Cache\CacheItemPoolInterface
+);
+
+// optional for debugging
+// $bartecService->setClientSoapOptions(['connection_timeout' => 20, 'trace' => 1]);
+// $debugInfo = $bartecService->getClient()->getCollectiveSoapClient()->getDebugInfo();
+
+/** @var Response $response */
+$response = $bartecService->getServiceRequestClasses();
+
+$result = $response->getResult();
+echo 'Example Service Class Name: ' . $result->ServiceClass[0]->Name . PHP_EOL;

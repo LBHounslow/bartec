@@ -4,7 +4,7 @@
 
 ## Requirements
 
-- PHP 7.2.5+
+- PHP 7.4.2+
 - Required extensions: [SOAP](https://www.php.net/manual/en/soap.installation.php), [Json](https://www.php.net/manual/en/json.installation.php)
 
 ## Setup

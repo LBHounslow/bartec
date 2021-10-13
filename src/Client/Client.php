@@ -8,7 +8,7 @@ use Bartec\Response\Response;
 class Client
 {
     public const WSDL_AUTH = 'https://collectiveapi.bartec-systems.com/Auth/Authenticate.asmx?WSDL';
-    public const WSDL_COLLECTIVE_API = 'https://collectiveapi.bartec-systems.com/API-R1531/CollectiveAPI.asmx?WSDL';
+    public const WSDL_COLLECTIVE_API_V15 = 'https://collectiveapi.bartec-systems.com/API-R1531/CollectiveAPI.asmx?WSDL';
 
     /**
      * @var SoapClient
@@ -21,11 +21,6 @@ class Client
     private $collectiveSoapClient;
 
     /**
-     * @var array
-     */
-    private $soapOptions = [];
-
-    /**
      * @var string
      */
     private $username;
@@ -34,6 +29,13 @@ class Client
      * @var string
      */
     private $password;
+
+    /**
+     * Overrides SOAP options in both SoapClients
+     *
+     * @var array
+     */
+    private $soapOptions = [];
 
     /**
      * @param SoapClient $authSoapClient
@@ -51,9 +53,9 @@ class Client
     ) {
         $this->authSoapClient = $authSoapClient;
         $this->collectiveSoapClient = $collectiveSoapClient;
-        $this->soapOptions = $soapOptions;
         $this->username = $username;
         $this->password = $password;
+        $this->setSoapOptions($soapOptions);
     }
 
     /**
@@ -61,8 +63,11 @@ class Client
      */
     public function getAuthSoapClient()
     {
-        return $this->authSoapClient
-            ->setOptions($this->getSoapOptions());
+        if ($this->getSoapOptions()) {
+            $this->authSoapClient
+                ->setOptions($this->getSoapOptions());
+        }
+        return $this->authSoapClient;
     }
 
     /**
@@ -70,8 +75,11 @@ class Client
      */
     public function getCollectiveSoapClient()
     {
-        return $this->collectiveSoapClient
-            ->setOptions($this->getSoapOptions());
+        if ($this->getSoapOptions()) {
+            $this->collectiveSoapClient
+                ->setOptions($this->getSoapOptions());
+        }
+        return $this->collectiveSoapClient;
     }
 
     /**
