@@ -17,6 +17,7 @@ use Psr\Cache\InvalidArgumentException;
 class BartecService
 {
     const CACHE_LIFETIME = 3600; // 1 hour
+    const CACHE_NAMESPACE = 'lb-hounslow/bartec';
 
     /**
      * @var BartecClient
@@ -24,15 +25,15 @@ class BartecService
     protected $client;
 
     /**
-     * @var CacheItemPoolInterface
+     * @var CacheItemPoolInterface|null
      */
     protected $cache;
 
     /**
      * @param BartecClient $client
-     * @param CacheItemPoolInterface $cache
+     * @param CacheItemPoolInterface|null $cache
      */
-    public function __construct(BartecClient $client, CacheItemPoolInterface $cache)
+    public function __construct(BartecClient $client, CacheItemPoolInterface $cache = null)
     {
         $this->client = $client;
         $this->cache = $cache;
@@ -220,27 +221,37 @@ class BartecService
      */
     public function getServiceRequestClasses()
     {
-        $cacheKey = md5(__CLASS__ . __METHOD__);
+        if ($this->cache) {
 
-        /** @var CacheItemInterface $cacheItem */
-        $cacheItem = $this->cache->getItem($cacheKey);
+            /** @var CacheItemInterface $cacheItem */
+            $cacheItem = $this->cache->getItem(
+                $this->generateCacheKey(__CLASS__ . __METHOD__)
+            );
 
-        if (!$cacheItem->isHit()) {
+            if (!$cacheItem->isHit()) {
+                /** @var Response $response */
+                $response = $this->client->call('ServiceRequests_Classes_Get');
+
+                if ($response->hasErrors()) {
+                    throw new SoapException($response);
+                }
+
+                $cacheItem
+                    ->set($response)
+                    ->expiresAt($this->getCacheExpiry(self::CACHE_LIFETIME));
+                $this->cache->save($cacheItem);
+            }
+
+            /** @var Response $response */
+            $response = $cacheItem->get();
+        } else {
             /** @var Response $response */
             $response = $this->client->call('ServiceRequests_Classes_Get');
 
             if ($response->hasErrors()) {
                 throw new SoapException($response);
             }
-
-            $cacheItem
-                ->set($response)
-                ->expiresAt($this->getCacheExpiry(self::CACHE_LIFETIME));
-            $this->cache->save($cacheItem);
         }
-
-        /** @var Response $response */
-        $response = $cacheItem->get();
 
         return $response;
     }
@@ -252,27 +263,37 @@ class BartecService
      */
     public function getServiceRequestTypes()
     {
-        $cacheKey = md5(__CLASS__ . __METHOD__);
+        if ($this->cache) {
 
-        /** @var CacheItemInterface $cacheItem */
-        $cacheItem = $this->cache->getItem($cacheKey);
+            /** @var CacheItemInterface $cacheItem */
+            $cacheItem = $this->cache->getItem(
+                $this->generateCacheKey(__CLASS__ . __METHOD__)
+            );
 
-        if (!$cacheItem->isHit()) {
+            if (!$cacheItem->isHit()) {
+                /** @var Response $response */
+                $response = $this->client->call('ServiceRequests_Types_Get');
+
+                if ($response->hasErrors()) {
+                    throw new SoapException($response);
+                }
+
+                $cacheItem
+                    ->set($response)
+                    ->expiresAt($this->getCacheExpiry(self::CACHE_LIFETIME));
+                $this->cache->save($cacheItem);
+            }
+
+            /** @var Response $response */
+            $response = $cacheItem->get();
+        } else {
             /** @var Response $response */
             $response = $this->client->call('ServiceRequests_Types_Get');
 
             if ($response->hasErrors()) {
                 throw new SoapException($response);
             }
-
-            $cacheItem
-                ->set($response)
-                ->expiresAt($this->getCacheExpiry(self::CACHE_LIFETIME));
-            $this->cache->save($cacheItem);
         }
-
-        /** @var Response $response */
-        $response = $cacheItem->get();
 
         return $response;
     }
@@ -285,12 +306,33 @@ class BartecService
      */
     public function getServiceRequestTypesByServiceRequestClassId(int $serviceRequestClassId)
     {
-        $cacheKey = md5(__METHOD__.$serviceRequestClassId);
+        if ($this->cache) {
 
-        /** @var CacheItemInterface $cacheItem */
-        $cacheItem = $this->cache->getItem($cacheKey);
+            /** @var CacheItemInterface $cacheItem */
+            $cacheItem = $this->cache->getItem(
+                $this->generateCacheKey(__METHOD__.$serviceRequestClassId)
+            );
 
-        if (!$cacheItem->isHit()) {
+            if (!$cacheItem->isHit()) {
+                /** @var Response $response */
+                $response = $this->client->call(
+                    'ServiceRequests_Types_Get',
+                    ['ServiceRequestClass' => $serviceRequestClassId]
+                );
+
+                if ($response->hasErrors()) {
+                    throw new SoapException($response);
+                }
+
+                $cacheItem
+                    ->set($response)
+                    ->expiresAt($this->getCacheExpiry(self::CACHE_LIFETIME));
+                $this->cache->save($cacheItem);
+            }
+
+            /** @var Response $response */
+            $response = $cacheItem->get();
+        } else {
             /** @var Response $response */
             $response = $this->client->call(
                 'ServiceRequests_Types_Get',
@@ -300,15 +342,7 @@ class BartecService
             if ($response->hasErrors()) {
                 throw new SoapException($response);
             }
-
-            $cacheItem
-                ->set($response)
-                ->expiresAt($this->getCacheExpiry(self::CACHE_LIFETIME));
-            $this->cache->save($cacheItem);
         }
-
-        /** @var Response $response */
-        $response = $cacheItem->get();
 
         return $response;
     }
@@ -593,28 +627,38 @@ class BartecService
      */
     public function getCrewIdFromCrewNumberAndWorkGroupName(int $crewNumber, string $workGroupName)
     {
-        $cacheKey = md5(__METHOD__.$crewNumber.$workGroupName);
+        if ($this->cache) {
 
-        /** @var CacheItemInterface $cacheItem */
-        $cacheItem = $this->cache->getItem($cacheKey);
+            /** @var CacheItemInterface $cacheItem */
+            $cacheItem = $this->cache->getItem(
+                $this->generateCacheKey(__METHOD__.$crewNumber.$workGroupName)
+            );
 
-        if (!$cacheItem->isHit()) {
+            if (!$cacheItem->isHit()) {
 
+                /** @var Response $response */
+                $response = $this->client->call('Crews_Get');
+
+                if ($response->hasErrors()) {
+                    throw new SoapException($response);
+                }
+
+                $cacheItem
+                    ->set($response)
+                    ->expiresAt($this->getCacheExpiry(self::CACHE_LIFETIME));
+                $this->cache->save($cacheItem);
+            }
+
+            /** @var Response $response */
+            $response = $cacheItem->get();
+        } else {
             /** @var Response $response */
             $response = $this->client->call('Crews_Get');
 
             if ($response->hasErrors()) {
                 throw new SoapException($response);
             }
-
-            $cacheItem
-                ->set($response)
-                ->expiresAt($this->getCacheExpiry(self::CACHE_LIFETIME));
-            $this->cache->save($cacheItem);
         }
-
-        /** @var Response $response */
-        $response = $cacheItem->get();
 
         foreach ($response->getResult()->Crew as $crew) {
             if ($crew->CrewNumber === $crewNumber && $crew->WorkGroup->Name === $workGroupName) {
@@ -633,28 +677,38 @@ class BartecService
      */
     public function getSlaIdFromSlaName(string $SLAName)
     {
-        $cacheKey = md5(__METHOD__.$SLAName);
+        if ($this->cache) {
 
-        /** @var CacheItemInterface $cacheItem */
-        $cacheItem = $this->cache->getItem($cacheKey);
+            /** @var CacheItemInterface $cacheItem */
+            $cacheItem = $this->cache->getItem(
+                $this->generateCacheKey(__METHOD__.$SLAName)
+            );
 
-        if (!$cacheItem->isHit()) {
+            if (!$cacheItem->isHit()) {
 
+                /** @var Response $response */
+                $response = $this->client->call('ServiceRequests_SLAs_Get');
+
+                if ($response->hasErrors()) {
+                    throw new SoapException($response);
+                }
+
+                $cacheItem
+                    ->set($response)
+                    ->expiresAt($this->getCacheExpiry(self::CACHE_LIFETIME));
+                $this->cache->save($cacheItem);
+            }
+
+            /** @var Response $response */
+            $response = $cacheItem->get();
+        } else {
             /** @var Response $response */
             $response = $this->client->call('ServiceRequests_SLAs_Get');
 
             if ($response->hasErrors()) {
                 throw new SoapException($response);
             }
-
-            $cacheItem
-                ->set($response)
-                ->expiresAt($this->getCacheExpiry(self::CACHE_LIFETIME));
-            $this->cache->save($cacheItem);
         }
-
-        /** @var Response $response */
-        $response = $cacheItem->get();
 
         foreach ($response->getResult()->ServiceLevelAgreement as $SLA) {
             if ($SLA->Name === $SLAName) {
@@ -673,28 +727,38 @@ class BartecService
      */
     public function getLandTypeIdFromLandTypeName(string $landName)
     {
-        $cacheKey = md5(__METHOD__.$landName);
+        if ($this->cache) {
 
-        /** @var CacheItemInterface $cacheItem */
-        $cacheItem = $this->cache->getItem($cacheKey);
+            /** @var CacheItemInterface $cacheItem */
+            $cacheItem = $this->cache->getItem(
+                $this->generateCacheKey(__METHOD__.$landName)
+            );
 
-        if (!$cacheItem->isHit()) {
+            if (!$cacheItem->isHit()) {
 
+                /** @var Response $response */
+                $response = $this->client->call('System_LandTypes_Get');
+
+                if ($response->hasErrors()) {
+                    throw new SoapException($response);
+                }
+
+                $cacheItem
+                    ->set($response)
+                    ->expiresAt($this->getCacheExpiry(self::CACHE_LIFETIME));
+                $this->cache->save($cacheItem);
+            }
+
+            /** @var Response $response */
+            $response = $cacheItem->get();
+        } else {
             /** @var Response $response */
             $response = $this->client->call('System_LandTypes_Get');
 
             if ($response->hasErrors()) {
                 throw new SoapException($response);
             }
-
-            $cacheItem
-                ->set($response)
-                ->expiresAt($this->getCacheExpiry(self::CACHE_LIFETIME));
-            $this->cache->save($cacheItem);
         }
-
-        /** @var Response $response */
-        $response = $cacheItem->get();
 
         foreach ($response->getResult()->LandType as $landType) {
             if ($landType->Name === $landName) {
@@ -956,5 +1020,14 @@ class BartecService
     public function getCacheExpiry(int $seconds)
     {
         return (new \DateTime())->add(new \DateInterval('PT'.$seconds.'S'));
+    }
+
+    /**
+     * @param string $key
+     * @return string
+     */
+    public function generateCacheKey(string $key)
+    {
+        return md5(self::CACHE_NAMESPACE . $key);
     }
 }

@@ -47,7 +47,7 @@ try {
 /** @var BartecService $bartecService */
 $bartecService = new BartecService(
     $bartecClient,
-    new FilesystemAdapter('Tests-functional-Service', BartecService::CACHE_LIFETIME) // Any cache library implementing Psr\Cache\CacheItemPoolInterface
+    new FilesystemAdapter('Tests-functional-Service', BartecService::CACHE_LIFETIME) // OPTIONAL: Any cache library implementing Psr\Cache\CacheItemPoolInterface
 );
 
 // optional for debugging
