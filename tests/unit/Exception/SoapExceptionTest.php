@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Exception;
 
-use Bartec\Exception\SoapException;
-use Bartec\Response\Response;
+use LBHounslow\Bartec\Exception\SoapException;
+use LBHounslow\Bartec\Response\Response;
 use Tests\Unit\BartecTestCase;
 
 class SoapExceptionTest extends BartecTestCase

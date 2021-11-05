@@ -1,11 +1,11 @@
 <?php
 require_once 'vendor/autoload.php';
 
-use Bartec\Exception\SoapException;
-use Bartec\Client\Client as BartecClient;
-use Bartec\Client\SoapClient;
-use Bartec\Response\Response;
-use Bartec\Service\BartecService;
+use LBHounslow\Bartec\Exception\SoapException;
+use LBHounslow\Bartec\Client\Client as BartecClient;
+use LBHounslow\Bartec\Client\SoapClient;
+use LBHounslow\Bartec\Response\Response;
+use LBHounslow\Bartec\Service\BartecService;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 // BARTEC CLIENT USAGE

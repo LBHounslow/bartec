@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Client;
 
-use Bartec\Client\SoapClient;
+use LBHounslow\Bartec\Client\SoapClient;
 use Tests\Unit\BartecTestCase;
 
 class SoapClientTest extends BartecTestCase

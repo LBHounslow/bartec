@@ -1,11 +1,11 @@
 <?php
 
-namespace Bartec\Service;
+namespace LBHounslow\Bartec\Service;
 
-use Bartec\Client\Client as BartecClient;
-use Bartec\Enum\BartecServiceEnum;
-use Bartec\Exception\SoapException;
-use Bartec\Response\Response;
+use LBHounslow\Bartec\Client\Client as BartecClient;
+use LBHounslow\Bartec\Enum\BartecServiceEnum;
+use LBHounslow\Bartec\Exception\SoapException;
+use LBHounslow\Bartec\Response\Response;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
