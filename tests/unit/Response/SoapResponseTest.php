@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Unit\Soap\Response;
+namespace Tests\Unit\Response;
 
-use Bartec\Response\SoapResponse;
+use LBHounslow\Bartec\Response\SoapResponse;
 use Tests\Unit\BartecTestCase;
 
 class SoapResponseTest extends BartecTestCase

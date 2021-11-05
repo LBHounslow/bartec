@@ -2,13 +2,13 @@
 
 namespace Tests\Functional\Service;
 
-use Bartec\Client\Client as BartecClient;
-use Bartec\Client\SoapClient;
-use Bartec\Enum\BartecServiceEnum;
-use Bartec\Enum\DateEnum;
-use Bartec\Exception\SoapException;
-use Bartec\Response\Response;
-use Bartec\Service\BartecService;
+use LBHounslow\Bartec\Client\Client as BartecClient;
+use LBHounslow\Bartec\Client\SoapClient;
+use LBHounslow\Bartec\Enum\BartecServiceEnum;
+use LBHounslow\Bartec\Enum\DateEnum;
+use LBHounslow\Bartec\Exception\SoapException;
+use LBHounslow\Bartec\Response\Response;
+use LBHounslow\Bartec\Service\BartecService;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Tests\functional\BartecTestCase;
 
