@@ -10,7 +10,7 @@ use LBHounslow\Bartec\Exception\SoapException;
 use LBHounslow\Bartec\Response\Response;
 use LBHounslow\Bartec\Service\BartecService;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Tests\functional\BartecTestCase;
+use Tests\Functional\BartecTestCase;
 
 class BartecServiceTest extends BartecTestCase
 {
@@ -24,9 +24,10 @@ class BartecServiceTest extends BartecTestCase
         $this->bartecService = new BartecService(
             new BartecClient(
                 new SoapClient(BartecClient::WSDL_AUTH),
-                new SoapClient(BartecClient::WSDL_COLLECTIVE_API_V15),
+                new SoapClient(BartecClient::WSDL_COLLECTIVE_API_V16),
                 'BARTEC_API_USERNAME',
-                'BARTEC_API_PASSWORD'
+                'BARTEC_API_PASSWORD',
+                ['trace' => 1]
             ),
             new FilesystemAdapter('Tests-functional-Service', BartecService::CACHE_LIFETIME)
         );
@@ -613,6 +614,7 @@ class BartecServiceTest extends BartecTestCase
     public function testItThrowsInvalidArgumentExceptionForInvalidFeatureTypeNames()
     {
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("'Invalid' is an invalid Bartec Feature Type Name");
         $this->bartecService->validateWasteContainerFeatureTypeNames(['Invalid']);
     }
 }
