@@ -65,7 +65,7 @@ class BartecService
     public function createServiceRequest(array $data)
     {
         $response = $this->client->call(
-            'ServiceRequests_Create',
+            'ServiceRequest_Create',
             $data
         );
 
@@ -85,12 +85,13 @@ class BartecService
     public function updateServiceRequest(string $serviceRequestCode, array $data)
     {
         $data['serviceCode'] = $serviceRequestCode;
+        $data['SR_ID'] = $this->getSR_IDFromServiceRequestCode($serviceRequestCode);
         if (empty($data['serviceLocationDescription'])) { // workaround for issue in Bartec API
             $data['serviceLocationDescription'] = '';
         }
 
         $response = $this->client->call(
-            'ServiceRequests_Update',
+            'ServiceRequest_Update',
             $data
         );
 
@@ -143,7 +144,7 @@ class BartecService
     {
         $response = $this->client->call(
             'ServiceRequests_Detail_Get',
-            ['ServiceCode' => $ServiceRequestCode]
+            ['ServiceCodes' => [$ServiceRequestCode]]
         );
 
         if ($response->hasErrors()) {
@@ -163,7 +164,7 @@ class BartecService
     {
         /** @var Response $response */
         $response = $this->client->call(
-            'ServiceRequests_Status_Set',
+            'ServiceRequest_Status_Set',
             [
                 'ServiceCode' => $ServiceRequest->ServiceCode,
                 'StatusID' => $ServiceRequestStatus->ID,
@@ -196,7 +197,7 @@ class BartecService
     ) {
         /** @var Response $response */
         $response = $this->client->call(
-            'ServiceRequests_Notes_Create',
+            'ServiceRequest_Note_Create',
             [
                 'ServiceRequestID' => $ServiceRequestID,
                 'ServiceCode' => null,
@@ -465,7 +466,7 @@ class BartecService
     public function createServiceRequestDocument(array $data)
     {
         /** @var Response $response */
-        $response = $this->client->call('Service_Request_Document_Create', $data);
+        $response = $this->client->call('ServiceRequest_Document_Create', $data);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -1011,6 +1012,15 @@ class BartecService
                 throw new \InvalidArgumentException(sprintf("'%s' is an invalid Bartec Feature Type Name", $featureTypeName));
             }
         }
+    }
+
+    /**
+     * @param string $serviceRequestCode
+     * @return int
+     */
+    public function getSR_IDFromServiceRequestCode(string $serviceRequestCode)
+    {
+        return (int) str_replace('SR', '', $serviceRequestCode);
     }
 
     /**
