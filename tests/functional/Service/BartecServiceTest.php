@@ -9,8 +9,7 @@ use LBHounslow\Bartec\Enum\DateEnum;
 use LBHounslow\Bartec\Exception\SoapException;
 use LBHounslow\Bartec\Response\Response;
 use LBHounslow\Bartec\Service\BartecService;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Tests\functional\BartecTestCase;
+use Tests\Functional\BartecTestCase;
 
 class BartecServiceTest extends BartecTestCase
 {
@@ -26,9 +25,10 @@ class BartecServiceTest extends BartecTestCase
                 new SoapClient(BartecClient::WSDL_AUTH),
                 new SoapClient(BartecClient::WSDL_COLLECTIVE_API_V15),
                 'BARTEC_API_USERNAME',
-                'BARTEC_API_PASSWORD'
-            ),
-            new FilesystemAdapter('Tests-functional-Service', BartecService::CACHE_LIFETIME)
+                'BARTEC_API_PASSWORD',
+                ['trace' => 1]
+            )
+            // no cache passed for testing
         );
         parent::setUp();
     }
@@ -565,6 +565,15 @@ class BartecServiceTest extends BartecTestCase
         $this->assertTrue(isset($result->FeatureType));
         $this->assertIsArray($result->FeatureType);
         $this->assertTrue(isset($result->FeatureType[0]->ID));
+    }
+
+    public function testItGetFeatureSchedules()
+    {
+        /** @var \stdClass $result */
+        $result = $this->bartecService->getFeatureSchedules(self::RESIDENTIAL_UPRN);
+        $this->assertTrue(isset($result->FeatureSchedule));
+        $this->assertIsArray($result->FeatureSchedule);
+        $this->assertTrue(isset($result->FeatureSchedule[0]->ID));
     }
 
     /**
