@@ -2,13 +2,14 @@
 
 ## Changelog
 
-### Release v1.5 `28/12/2021`
+### Release v1.5 `29/12/2021`
 
 - Added [getFeatureSchedules](https://github.com/LBHounslow/bartec/blob/hotfix-get-feature-schedules/src/Service/BartecService.php#L940) to the BartecService along with [functional test coverage](https://github.com/LBHounslow/bartec/blob/hotfix-get-feature-schedules/tests/functional/Service/BartecServiceTest.php#L570).
 - Updated [phpunit.xml.dist](https://github.com/LBHounslow/bartec/blob/hotfix-get-feature-schedules/phpunit.xml.dist#L1) and added [script to composer.json](https://github.com/LBHounslow/bartec/blob/hotfix-get-feature-schedules/composer.json#L25) to run all tests using `composer test`
+- Added [CHANGELOG](https://github.com/LBHounslow/bartec/blob/hotfix-get-feature-schedules/docs/CHANGELOG.md) and moved usage to [USAGE](https://github.com/LBHounslow/bartec/blob/hotfix-get-feature-schedules/docs/USAGE.md) docs. Added phpunit code [test coverage report to README](https://github.com/LBHounslow/bartec/blob/hotfix-get-feature-schedules/README.md?plain=1#L30).
 
 Fixes:
-- Corrected namespace [case issue](https://github.com/LBHounslow/bartec/blob/hotfix-get-feature-schedules/tests/functional/Service/BartecServiceTest.php#L12) in BartecServiceTest.
+- Corrected namespace [case issue](https://github.com/LBHounslow/bartec/blob/hotfix-get-feature-schedules/tests/functional/Service/BartecServiceTest.php#L12) in `BartecServiceTest` and `BartecTestCase`.
 
 ### Release v1.4 `05/11/2021`
 
