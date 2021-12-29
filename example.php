@@ -6,7 +6,6 @@ use LBHounslow\Bartec\Client\Client as BartecClient;
 use LBHounslow\Bartec\Client\SoapClient;
 use LBHounslow\Bartec\Response\Response;
 use LBHounslow\Bartec\Service\BartecService;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 // BARTEC CLIENT USAGE
 $bartecClient = new BartecClient(
@@ -47,7 +46,7 @@ try {
 /** @var BartecService $bartecService */
 $bartecService = new BartecService(
     $bartecClient,
-    new FilesystemAdapter('Tests-functional-Service', BartecService::CACHE_LIFETIME) // OPTIONAL: Any cache library implementing Psr\Cache\CacheItemPoolInterface
+    // OPTIONAL: Any cache library implementing Psr\Cache\CacheItemPoolInterface
 );
 
 // optional for debugging

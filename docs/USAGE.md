@@ -21,9 +21,9 @@ $bartecClient = new BartecClient(
 /** @var BartecService $bartecService */
 $bartecService = new BartecService(
     $bartecClient,  // instance of BartecClient
-    new FilesystemAdapter('Tests-functional-Service', BartecService::CACHE_LIFETIME)  // Optional PSR-6 cache library
+    // Optional PSR-6 cache library
 );
 
 ```
 
-See [example.php](example.php)
+See [example.php](../example.php)
