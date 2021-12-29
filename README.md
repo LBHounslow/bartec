@@ -1,56 +1,41 @@
-# London Borough of Hounslow
+## London Borough of Hounslow - Bartec Collective
 
-#### A client for the [Bartec Collective API v16](https://confluence.bartecautoid.com/display/COLLAPIR16/) SOAP Web  Service
+#### A client and service for the [Bartec Collective API v15](https://confluence.bartecautoid.com/display/COLLAPIR15/) SOAP Web Service
+
+For more on how to use this client, see [usage documentation](docs/USAGE.md)
+
+### Releases
+
+- These are covered in [the Changelog](docs/CHANGELOG.md)
 
 ## Requirements
 
-- PHP 7.4.2+
-- Required extensions: [SOAP](https://www.php.net/manual/en/soap.installation.php), [Json](https://www.php.net/manual/en/json.installation.php)
+- [PHP 7.4.2+](https://www.php.net/downloads.php)
+- [Git](https://git-scm.com/downloads)
+- [Composer](https://getcomposer.org)
 
 ## Setup
 
 - `composer install`
 
-## Usage
-
-### Bartec Client Usage
-```
-/** BartecClient $bartecClient **/
-$bartecClient = new BartecClient(
-    new SoapClient(BartecClient::WSDL_AUTH),
-    new SoapClient(BartecClient::WSDL_COLLECTIVE_API_V16),
-    'BARTEC_API_USERNAME',
-    'BARTEC_API_PASSWORD',
-    ['trace' => 1] // optional for debugging
-);
-```
-### Bartec Service Usage
-
-```
-/** @var BartecService $bartecService */
-$bartecService = new BartecService(
-    $bartecClient,  // instance of BartecClient
-    new FilesystemAdapter('Tests-functional-Service', BartecService::CACHE_LIFETIME)  // Optional PSR-6 cache library
-);
-
-```
-
-See [example.php](example.php)
-
 ## Tests
 
 Update [BartecServiceTest](tests/functional/Service/BartecServiceTest.php) with your Bartec TEST API credentials
 
-Run Unit and Functional Tests
+Run all tests
  
 `composer test`
 
 ```
 Code Coverage Report:      
-  2021-12-14 14:22:25      
+  2021-12-29 08:54:20      
                            
  Summary:                  
   Classes: 33.33% (2/6)    
-  Methods: 53.25% (41/77)  
-  Lines:   75.28% (338/449)
+  Methods: 51.28% (40/78)  
+  Lines:   73.63% (335/455)
 ```
+
+### Contributing
+
+This repository is currently closed for contribution. Please [report an an issue](https://github.com/LBHounslow/bartec/issues) if you come across one.

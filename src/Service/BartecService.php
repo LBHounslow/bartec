@@ -935,6 +935,25 @@ class BartecService
 
     /**
      * @param string $UPRN
+     * @return mixed|null
+     * @throws SoapException
+     */
+    public function getFeatureSchedules(string $UPRN)
+    {
+        $response = $this->client->call(
+            'Features_Schedules_Get',
+            ['UPRN' => $UPRN, 'Types' => '']
+        );
+
+        if ($response->hasErrors()) {
+            throw new SoapException($response);
+        }
+
+        return $response->getResult();
+    }
+
+    /**
+     * @param string $UPRN
      * @param array $featureTypeNames
      * @param array $featureStates
      * @param bool $includeRelated
