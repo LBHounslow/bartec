@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### Release v1.6 `29/12/2021`
+
+Removed `symfony/cache` dependency - this was only ever used in the usage example.
+
 ### Release v1.5 `29/12/2021`
 
 - Added [getFeatureSchedules](https://github.com/LBHounslow/bartec/blob/hotfix-get-feature-schedules/src/Service/BartecService.php#L940) to the BartecService along with [functional test coverage](https://github.com/LBHounslow/bartec/blob/hotfix-get-feature-schedules/tests/functional/Service/BartecServiceTest.php#L570).
