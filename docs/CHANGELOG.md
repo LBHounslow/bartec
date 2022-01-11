@@ -2,6 +2,13 @@
 
 ## Changelog
 
+### Release v1.7 `11/01/2022`
+
+- Fix for `getEventsByUPRN` maximum date.
+- Changed the return type for the relevant service calls to `\stdClass|null`
+- Added optional arguments for `getEventsByUPRN` and `getJobs`
+- Added/sorted more enumerated fields.
+
 ### Release v1.6 `29/12/2021`
 
 Removed `symfony/cache` dependency - this was only ever used in the usage example.

@@ -106,7 +106,7 @@ class BartecService
      * @param string $minimumDate
      * @param string $maximumDate
      * @param int $serviceTypeId
-     * @return mixed|null
+     * @return \stdClass|null
      * @throws SoapException
      */
     public function getServiceRequests(
@@ -475,7 +475,7 @@ class BartecService
 
     /**
      * @param string $UPRN
-     * @return mixed|null
+     * @return \stdClass|null
      * @throws SoapException
      */
     public function getPremisesByUPRN(string $UPRN)
@@ -494,7 +494,7 @@ class BartecService
 
     /**
      * @param string $UPRN
-     * @return mixed|null
+     * @return \stdClass|null
      * @throws SoapException
      */
     public function getPremisesDetailByUPRN(string $UPRN)
@@ -513,7 +513,7 @@ class BartecService
 
     /**
      * @param string $UPRN
-     * @return mixed|null
+     * @return \stdClass|null
      * @throws SoapException
      */
     public function getPremisesAttributes(string $UPRN)
@@ -773,25 +773,35 @@ class BartecService
      * @param string $UPRN
      * @param string $minimumDate
      * @param string $maximumDate
-     * @return mixed|null
+     * @param bool $includeRelated
+     * @param int|null $workPackID
+     * @return \stdClass|null
      * @throws SoapException
      */
     public function getJobs(
         string $UPRN,
         string $minimumDate,
-        string $maximumDate
+        string $maximumDate,
+        bool $includeRelated = true,
+        $workPackID = null
     ) {
+        $data = [
+            'UPRN' => $UPRN,
+            'WorkPackID' => $workPackID,
+            'ScheduleStart' => [
+                'MinimumDate' => $minimumDate,
+                'MaximumDate' => $maximumDate,
+            ],
+            'IncludeRelated' => ''
+        ];
+
+        if ($includeRelated) {
+            $data['IncludeRelated'] = 1;
+        }
+
         $response = $this->client->call(
             'Jobs_Get',
-            [
-                'UPRN' => $UPRN,
-                'WorkPackID' => null,
-                'ScheduleStart' => [
-                    'MinimumDate' => $minimumDate,
-                    'MaximumDate' => $maximumDate,
-                ],
-                'IncludeRelated' => 1
-            ]
+            $data
         );
 
         if ($response->hasErrors()) {
@@ -803,7 +813,7 @@ class BartecService
 
     /**
      * @param int $jobId
-     * @return mixed|null
+     * @return \stdClass|null
      * @throws SoapException
      */
     public function getJobDetail(int $jobId) {
@@ -823,25 +833,35 @@ class BartecService
      * @param string $UPRN
      * @param string $minimumDate
      * @param string $maximumDate
-     * @return mixed|null
+     * @param bool $includeRelated
+     * @param string|null $workpack
+     * @return \stdClass|null
      * @throws SoapException
      */
     public function getEventsByUPRN(
         string $UPRN,
         string $minimumDate = '',
-        string $maximumDate = ''
+        string $maximumDate = '',
+        bool $includeRelated = true,
+        $workpack = null
     ) {
-        $data = ['UPRN' => $UPRN];
+        $data = [
+            'UPRN' => $UPRN,
+            'WorkPack' => $workpack,
+            'IncludeRelated' => ''
+        ];
 
         if ($minimumDate) {
             $data['DateRange']['MinimumDate'] = $minimumDate;
         }
 
-        if ($minimumDate) {
-            $data['DateRange']['MaximumDate'] = $minimumDate;
+        if ($maximumDate) {
+            $data['DateRange']['MaximumDate'] = $maximumDate;
         }
 
-        $data['IncludeRelated'] = '';
+        if ($includeRelated) {
+            $data['IncludeRelated'] = 1;
+        }
 
         $response = $this->client->call(
             'Premises_Events_Get',
@@ -916,7 +936,7 @@ class BartecService
     }
 
     /**
-     * @return mixed|null
+     * @return \stdClass|null
      * @throws SoapException
      */
     public function getFeatureTypes()
@@ -934,7 +954,7 @@ class BartecService
 
     /**
      * @param string $UPRN
-     * @return mixed|null
+     * @return \stdClass|null
      * @throws SoapException
      */
     public function getFeatureSchedules(string $UPRN)
