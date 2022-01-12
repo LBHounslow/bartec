@@ -8,7 +8,7 @@
 /** BartecClient $bartecClient **/
 $bartecClient = new BartecClient(
     new SoapClient(BartecClient::WSDL_AUTH),
-    new SoapClient(BartecClient::WSDL_COLLECTIVE_API_V15),
+    new SoapClient(BartecClient::WSDL_COLLECTIVE_API_V16), # WSDL_COLLECTIVE_API_V15 also available
     'BARTEC_API_USERNAME',
     'BARTEC_API_PASSWORD',
     ['trace' => 1] // optional for debugging

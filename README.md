@@ -1,6 +1,10 @@
 ## London Borough of Hounslow - Bartec Collective
 
-#### A client and service for the [Bartec Collective API v15](https://confluence.bartecautoid.com/display/COLLAPIR15/) SOAP Web Service
+#### A client and service for the [Bartec Collective](https://www.bartecmunicipal.com/software/collective/) SOAP Web Service
+
+The current version of the web service is [v16](https://confluence.bartecautoid.com/display/COLLAPIR16/).
+
+The [v15](https://confluence.bartecautoid.com/display/COLLAPIR15/) service is still available [here](src/Service/v15/BartecService.php).
 
 For more on how to use this client, see [usage documentation](docs/USAGE.md)
 

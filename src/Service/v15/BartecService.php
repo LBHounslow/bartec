@@ -1,6 +1,6 @@
 <?php
 
-namespace LBHounslow\Bartec\Service;
+namespace LBHounslow\Bartec\Service\v15;
 
 use LBHounslow\Bartec\Client\Client as BartecClient;
 use LBHounslow\Bartec\Enum\BartecServiceEnum;
@@ -65,7 +65,7 @@ class BartecService
     public function createServiceRequest(array $data)
     {
         $response = $this->client->call(
-            'ServiceRequest_Create',
+            'ServiceRequests_Create',
             $data
         );
 
@@ -85,13 +85,12 @@ class BartecService
     public function updateServiceRequest(string $serviceRequestCode, array $data)
     {
         $data['serviceCode'] = $serviceRequestCode;
-        $data['SR_ID'] = $this->getNumericIDFromServiceRequestCode($serviceRequestCode);
         if (empty($data['serviceLocationDescription'])) { // workaround for issue in Bartec API
             $data['serviceLocationDescription'] = '';
         }
 
         $response = $this->client->call(
-            'ServiceRequest_Update',
+            'ServiceRequests_Update',
             $data
         );
 
@@ -144,7 +143,7 @@ class BartecService
     {
         $response = $this->client->call(
             'ServiceRequests_Detail_Get',
-            ['ServiceCodes' => [$ServiceRequestCode]]
+            ['ServiceCode' => $ServiceRequestCode]
         );
 
         if ($response->hasErrors()) {
@@ -164,7 +163,7 @@ class BartecService
     {
         /** @var Response $response */
         $response = $this->client->call(
-            'ServiceRequest_Status_Set',
+            'ServiceRequests_Status_Set',
             [
                 'ServiceCode' => $ServiceRequest->ServiceCode,
                 'StatusID' => $ServiceRequestStatus->ID,
@@ -197,7 +196,7 @@ class BartecService
     ) {
         /** @var Response $response */
         $response = $this->client->call(
-            'ServiceRequest_Note_Create',
+            'ServiceRequests_Notes_Create',
             [
                 'ServiceRequestID' => $ServiceRequestID,
                 'ServiceCode' => null,
@@ -466,7 +465,7 @@ class BartecService
     public function createServiceRequestDocument(array $data)
     {
         /** @var Response $response */
-        $response = $this->client->call('ServiceRequest_Document_Create', $data);
+        $response = $this->client->call('Service_Request_Document_Create', $data);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -784,7 +783,7 @@ class BartecService
         string $minimumDate,
         string $maximumDate,
         bool $includeRelated = true,
-        $workPackID = null
+               $workPackID = null
     ) {
         $data = [
             'UPRN' => $UPRN,
@@ -844,7 +843,7 @@ class BartecService
         string $minimumDate = '',
         string $maximumDate = '',
         bool $includeRelated = true,
-        $workpack = null
+               $workpack = null
     ) {
         $data = [
             'UPRN' => $UPRN,
@@ -1051,15 +1050,6 @@ class BartecService
                 throw new \InvalidArgumentException(sprintf("'%s' is an invalid Bartec Feature Type Name", $featureTypeName));
             }
         }
-    }
-
-    /**
-     * @param string $serviceRequestCode
-     * @return int
-     */
-    public function getNumericIDFromServiceRequestCode(string $serviceRequestCode)
-    {
-        return (int) str_replace('SR', '', $serviceRequestCode);
     }
 
     /**

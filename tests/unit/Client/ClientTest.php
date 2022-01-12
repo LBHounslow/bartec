@@ -7,6 +7,7 @@ use LBHounslow\Bartec\Client\SoapClient;
 use LBHounslow\Bartec\Exception\SoapException;
 use LBHounslow\Bartec\Response\Response;
 use LBHounslow\Bartec\Response\SoapResponse;
+use PHPUnit\Framework\MockObject\MockObject;
 use Tests\Unit\BartecTestCase;
 
 class ClientTest extends BartecTestCase
@@ -17,7 +18,7 @@ class ClientTest extends BartecTestCase
     private $bartecClient;
 
     /**
-     * @var SoapClient|\PHPUnit\Framework\MockObject\MockObject
+     * @var SoapClient|MockObject
      */
     private $mockSoapClient;
 

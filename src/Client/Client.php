@@ -9,6 +9,7 @@ class Client
 {
     public const WSDL_AUTH = 'https://collectiveapi.bartec-systems.com/Auth/Authenticate.asmx?WSDL';
     public const WSDL_COLLECTIVE_API_V15 = 'https://collectiveapi.bartec-systems.com/API-R1531/CollectiveAPI.asmx?WSDL';
+    public const WSDL_COLLECTIVE_API_V16 = 'https://collectiveapi.bartec-systems.com/API-R1604/CollectiveAPI.asmx?WSDL';
 
     /**
      * @var SoapClient
