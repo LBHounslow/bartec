@@ -8,7 +8,7 @@ use LBHounslow\Bartec\Enum\BartecServiceEnum;
 use LBHounslow\Bartec\Enum\DateEnum;
 use LBHounslow\Bartec\Exception\SoapException;
 use LBHounslow\Bartec\Response\Response;
-use LBHounslow\Bartec\Service\BartecService;
+use LBHounslow\Bartec\Service\v15\BartecService;
 use Tests\Functional\BartecTestCase;
 
 class BartecServiceTest extends BartecTestCase
