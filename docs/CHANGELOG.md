@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### Release v1.8 `24/01/2022`
+
+- Adjusted php minimum version from >=7.4.2 to ^7.2 so it is compatible with Jadu.
+
 ### Release v1.7 `11/01/2022`
 
 - Fix for `getEventsByUPRN` maximum date.
