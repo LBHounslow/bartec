@@ -4,7 +4,7 @@
   "type": "library",
   "license": "proprietary",
   "require": {
-    "php": ">=7.4.2",
+    "php": "^7.2",
     "ext-json": "*",
     "ext-soap": "*",
     "psr/cache": "^1.0"
