@@ -10,7 +10,7 @@ For more on how to use this client, see [usage documentation](docs/USAGE.md)
 
 ## Requirements
 
-- [PHP 7.4.2+](https://www.php.net/downloads.php)
+- [PHP 7.2+](https://www.php.net/downloads.php)
 - [Git](https://git-scm.com/downloads)
 - [Composer](https://getcomposer.org)
 
