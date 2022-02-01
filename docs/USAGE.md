@@ -20,7 +20,8 @@ $bartecClient = new BartecClient(
 ```
 /** @var BartecService $bartecService */
 $bartecService = new BartecService(
-    $bartecClient,  // instance of BartecClient
+    $bartecClient,              // instance of BartecClient
+    Version15Adapter::VERSION,  // version to use (v15 or v16)
     // Optional PSR-6 cache library
 );
 

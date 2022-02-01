@@ -1,16 +1,17 @@
 <?php
 require_once 'vendor/autoload.php';
 
-use LBHounslow\Bartec\Exception\SoapException;
+use LBHounslow\Bartec\Adapter\Version15Adapter;
 use LBHounslow\Bartec\Client\Client as BartecClient;
 use LBHounslow\Bartec\Client\SoapClient;
+use LBHounslow\Bartec\Exception\SoapException;
 use LBHounslow\Bartec\Response\Response;
 use LBHounslow\Bartec\Service\BartecService;
 
 // BARTEC CLIENT USAGE
 $bartecClient = new BartecClient(
     new SoapClient(BartecClient::WSDL_AUTH),
-    new SoapClient(BartecClient::WSDL_COLLECTIVE_API_V15),
+    new SoapClient(Version15Adapter::WSDL_COLLECTIVE_API), // v15
     'BARTEC_API_USERNAME',
     'BARTEC_API_PASSWORD'
 );
@@ -46,6 +47,7 @@ try {
 /** @var BartecService $bartecService */
 $bartecService = new BartecService(
     $bartecClient,
+    Version15Adapter::VERSION // v15
     // OPTIONAL: Any cache library implementing Psr\Cache\CacheItemPoolInterface
 );
 

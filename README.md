@@ -1,6 +1,10 @@
 ## London Borough of Hounslow - Bartec Collective
 
-#### A client and service for the [Bartec Collective API v15](https://confluence.bartecautoid.com/display/COLLAPIR15/) SOAP Web Service
+#### A library for the [Bartec Collective](https://www.bartecmunicipal.com/software/collective/) SOAP Web Service
+
+This library includes both a [Client](src/Client/Client.php) and a [BartecService](src/Service/BartecService.php). The library can be used with [v15](https://collectiveapi.bartec-systems.com/API-R1531/CollectiveAPI.asmx?WSDL) or [v16](https://collectiveapi.bartec-systems.com/API-R1604/CollectiveAPI.asmx?WSDL) of the Bartec Collective.
+
+The [BartecService](src/Service/BartecService.php) has several methods that are used regularly by LBHounslow which you are free to use. For any other call you can use the [Client](src/Client/Client.php) directly.
 
 For more on how to use this client, see [usage documentation](docs/USAGE.md)
 

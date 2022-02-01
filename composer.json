@@ -1,6 +1,6 @@
 {
   "name": "lb-hounslow/bartec",
-  "description": "A client and basic service for the Bartec Collective API v15 SOAP Web Service",
+  "description": "A library for the Bartec Collective API SOAP Web Service",
   "type": "library",
   "license": "proprietary",
   "require": {

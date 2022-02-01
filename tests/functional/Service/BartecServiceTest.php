@@ -2,6 +2,7 @@
 
 namespace Tests\Functional\Service;
 
+use LBHounslow\Bartec\Adapter\Version15Adapter;
 use LBHounslow\Bartec\Client\Client as BartecClient;
 use LBHounslow\Bartec\Client\SoapClient;
 use LBHounslow\Bartec\Enum\BartecServiceEnum;
@@ -23,11 +24,12 @@ class BartecServiceTest extends BartecTestCase
         $this->bartecService = new BartecService(
             new BartecClient(
                 new SoapClient(BartecClient::WSDL_AUTH),
-                new SoapClient(BartecClient::WSDL_COLLECTIVE_API_V15),
+                new SoapClient(Version15Adapter::WSDL_COLLECTIVE_API), // v15
                 'BARTEC_API_USERNAME',
                 'BARTEC_API_PASSWORD',
                 ['trace' => 1]
-            )
+            ),
+            Version15Adapter::VERSION // v15
             // no cache passed for testing
         );
         parent::setUp();
