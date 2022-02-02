@@ -14,6 +14,12 @@ class Version16Adapter extends AbstractApiVersionAdapter
      */
     public function createServiceRequest(array $data)
     {
+        // Correct any v15 service requests with the old extended data field
+        if (isset($data['extendedData']['ServiceRequests_CreateServiceRequests_CreateFields'])) {
+            $data['extendedData']['ServiceRequest_CreateServiceRequest_CreateFields'] = $data['extendedData']['ServiceRequests_CreateServiceRequests_CreateFields'];
+            unset($data['extendedData']['ServiceRequests_CreateServiceRequests_CreateFields']);
+        }
+
         return $this->bartecClient->call(
             'ServiceRequest_Create',
             $data

@@ -23,8 +23,8 @@ class BartecService
     const CACHE_NAMESPACE = 'lb-hounslow/bartec';
 
     const VERSION_ADAPTERS = [
-        'v15' => Version15Adapter::class,
-        'v16' => Version16Adapter::class
+        Version15Adapter::VERSION => Version15Adapter::class,
+        Version16Adapter::VERSION => Version16Adapter::class
     ];
 
     /**
