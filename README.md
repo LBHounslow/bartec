@@ -24,7 +24,7 @@ For more on how to use this client, see [usage documentation](docs/USAGE.md)
 
 ## Tests
 
-Update [BartecServiceTest](tests/functional/Service/BartecServiceTest.php) with your Bartec TEST API credentials
+Update the constants in [BartecServiceTest](tests/functional/Service/BartecServiceTest.php) for functional tests.
 
 Run all tests
  
@@ -32,12 +32,12 @@ Run all tests
 
 ```
 Code Coverage Report:      
-  2021-12-29 08:54:20      
+  2022-02-02 15:46:14      
                            
  Summary:                  
-  Classes: 33.33% (2/6)    
-  Methods: 51.28% (40/78)  
-  Lines:   73.63% (335/455)
+  Classes: 22.22% (2/9)    
+  Methods: 58.62% (68/116) 
+  Lines:   73.12% (408/558)
 ```
 
 ### Contributing

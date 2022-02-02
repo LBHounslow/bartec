@@ -12,6 +12,22 @@ class Version16Adapter extends AbstractApiVersionAdapter
     /**
      * @inheritdoc
      */
+    public function getVersion()
+    {
+        return self::VERSION;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCollectiveWsdl()
+    {
+        return self::WSDL_COLLECTIVE_API;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function createServiceRequest(array $data)
     {
         // Correct any v15 service requests with the old extended data field

@@ -9,6 +9,16 @@ use LBHounslow\Bartec\Response\Response;
 interface ApiVersionAdapterInterface
 {
     /**
+     * @return string
+     */
+    public function getVersion();
+
+    /**
+     * @return string
+     */
+    public function getCollectiveWsdl();
+
+    /**
      * @return BartecClient
      */
     public function getBartecClient();

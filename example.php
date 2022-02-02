@@ -48,6 +48,7 @@ try {
 $bartecService = new BartecService(
     $bartecClient,
     Version16Adapter::VERSION // v16
+    // OPTIONAL: Override the WSDL in the version adapters
     // OPTIONAL: Any cache library implementing Psr\Cache\CacheItemPoolInterface
 );
 

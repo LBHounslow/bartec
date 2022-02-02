@@ -15,9 +15,16 @@ abstract class AbstractApiVersionAdapter implements ApiVersionAdapterInterface
 
     /**
      * @param BartecClient $bartecClient
+     * @param string $WSDL // Collective WSDL override
      */
-    public function __construct(BartecClient $bartecClient)
+    public function __construct(BartecClient $bartecClient, string $WSDL = '')
     {
+        $bartecClient
+            ->getCollectiveSoapClient()
+                ->setWsdl(
+                $WSDL === '' ? $this->getCollectiveWsdl() : $WSDL
+                );
+
         $this->bartecClient = $bartecClient;
     }
 

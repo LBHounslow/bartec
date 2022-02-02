@@ -2,7 +2,6 @@
 
 ## Usage
 
-
 ### Bartec Client Usage
 ```
 /** BartecClient $bartecClient **/
@@ -22,7 +21,8 @@ $bartecClient = new BartecClient(
 $bartecService = new BartecService(
     $bartecClient,              // instance of BartecClient
     Version16Adapter::VERSION,  // version to use (v15 or v16)
-    // Optional PSR-6 cache library
+    // OPTIONAL: Override the WSDL in the version adapters
+    // OPTIONAL: Any Psr\Cache\CacheItemPoolInterface cache
 );
 
 ```

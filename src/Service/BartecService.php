@@ -40,24 +40,27 @@ class BartecService
     /**
      * @param BartecClient $bartecClient
      * @param string $version
+     * @param string $WSDL // Override for Collective WSDL
      * @param CacheItemPoolInterface|null $cache
      */
     public function __construct(
         BartecClient $bartecClient,
         string $version,
+        $WSDL = '',
         CacheItemPoolInterface $cache = null
     ) {
-        $this->apiVersionAdapter = $this->factoryApiVersionAdapter($bartecClient, $version);
+        $this->apiVersionAdapter = $this->factoryApiVersionAdapter($bartecClient, $version, $WSDL);
         $this->cache = $cache;
     }
 
     /**
      * @param BartecClient $bartecClient
      * @param string $version
+     * @param string $WSDL
      * @return ApiVersionAdapterInterface
      * @throws \InvalidArgumentException
      */
-    public function factoryApiVersionAdapter(BartecClient $bartecClient, string $version)
+    public function factoryApiVersionAdapter(BartecClient $bartecClient, string $version, string $WSDL)
     {
         if (!in_array($version, array_keys(self::VERSION_ADAPTERS))) {
             throw new \InvalidArgumentException(sprintf("Version '%s' is not supported", $version));
@@ -65,7 +68,7 @@ class BartecService
 
         $versionAdapterClass = self::VERSION_ADAPTERS[$version];
 
-        return new $versionAdapterClass($bartecClient);
+        return new $versionAdapterClass($bartecClient, $WSDL);
     }
 
     /**

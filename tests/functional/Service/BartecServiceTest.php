@@ -14,6 +14,12 @@ use Tests\Functional\BartecTestCase;
 
 class BartecServiceTest extends BartecTestCase
 {
+    // UPDATE THESE PRIOR TO TESTING
+    const API_VERSION = Version16Adapter::VERSION; // v16
+    const COLLECTIVE_WSDL = Version16Adapter::WSDL_COLLECTIVE_API; // v16
+    const BARTEC_USERNAME = 'BARTEC_API_USERNAME';
+    const BARTEC_PASSWORD = 'BARTEC_API_PASSWORD';
+
     /**
      * @var BartecService
      */
@@ -21,17 +27,21 @@ class BartecServiceTest extends BartecTestCase
 
     public function setUp(): void
     {
-        $this->bartecService = new BartecService(
-            new BartecClient(
-                new SoapClient(BartecClient::WSDL_AUTH),
-                new SoapClient(Version16Adapter::WSDL_COLLECTIVE_API), // v16
-                'BARTEC_API_USERNAME',
-                'BARTEC_API_PASSWORD',
-                ['trace' => 1]
-            ),
-            Version16Adapter::VERSION // v16
-            // no cache passed for testing
-        );
+        if (!$this->bartecService) {
+            $this->bartecService = new BartecService(
+                new BartecClient(
+                    new SoapClient(BartecClient::WSDL_AUTH),
+                    new SoapClient(self::COLLECTIVE_WSDL),
+                    self::BARTEC_USERNAME,
+                    self::BARTEC_PASSWORD,
+                    ['trace' => 1]
+                ),
+                self::API_VERSION
+                // no WSDL override required
+                // no cache required for tests
+            );
+        }
+
         parent::setUp();
     }
 
@@ -56,6 +66,31 @@ class BartecServiceTest extends BartecTestCase
 
         $this->assertEquals($soapOptions, $authSoapClientOptions);
         $this->assertEquals($soapOptions, $collectiveSoapClientOptions);
+    }
+
+    public function testThatBartecServiceSetsCorrectWsdlInCollectiveSoapClient()
+    {
+        $result = $this->bartecService->getClient()->getCollectiveSoapClient()->getWsdl();
+        $this->assertEquals(self::COLLECTIVE_WSDL, $result);
+    }
+
+    public function testThatCustomWsdlPassedIntoBartecServiceCanOverrideDefaultVersionAdapterWsdl()
+    {
+        $bartecService = new BartecService(
+            new BartecClient(
+                new SoapClient(BartecClient::WSDL_AUTH),
+                new SoapClient(self::COLLECTIVE_WSDL),
+                self::BARTEC_USERNAME,
+                self::BARTEC_PASSWORD,
+                ['trace' => 1]
+            ),
+            self::API_VERSION,
+        'https://testing.custom?WSDL' // <--------
+        // no cache required for tests
+        );
+
+        $result = $bartecService->getClient()->getCollectiveSoapClient()->getWsdl();
+        $this->assertEquals('https://testing.custom?WSDL', $result);
     }
 
     public function testItGetsServiceRequestClasses()

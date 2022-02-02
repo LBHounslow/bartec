@@ -2,6 +2,15 @@
 
 ## Changelog
 
+### Release v1.9 `02/02/2022`
+
+This release is in preparation for Hounslow switching from Bartec Collective v15 to v16.
+
+- Added an API version adapter so that we can separate the version specific SOAP Service changes (differences between v15 and v16) into [Version15Adapter](../src/Adapter/Version15Adapter.php) and [Version16Adapter](../src/Adapter/Version16Adapter.php).
+- The [BartecService](../src/Service/BartecService.php) now accepts **version** as an argument (eg. `v15` or `v16`) and will load the appropriate version adapter and WSDL. 
+- You are able to override the version adapter WSDL by passing this into the `BartecService` if it changes due to a release.
+- Updated functional test coverage to cover new functional in `BartecService`.
+
 ### Release v1.8 `24/01/2022`
 
 - Adjusted php minimum version from >=7.4.2 to ^7.2 so it is compatible with Jadu.
