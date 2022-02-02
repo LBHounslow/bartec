@@ -2,13 +2,12 @@
 
 ## Usage
 
-
 ### Bartec Client Usage
 ```
 /** BartecClient $bartecClient **/
 $bartecClient = new BartecClient(
     new SoapClient(BartecClient::WSDL_AUTH),
-    new SoapClient(BartecClient::WSDL_COLLECTIVE_API_V15),
+    new SoapClient(Version16Adapter::WSDL_COLLECTIVE_API),
     'BARTEC_API_USERNAME',
     'BARTEC_API_PASSWORD',
     ['trace' => 1] // optional for debugging
@@ -20,8 +19,10 @@ $bartecClient = new BartecClient(
 ```
 /** @var BartecService $bartecService */
 $bartecService = new BartecService(
-    $bartecClient,  // instance of BartecClient
-    // Optional PSR-6 cache library
+    $bartecClient,              // instance of BartecClient
+    Version16Adapter::VERSION,  // version to use (v15 or v16)
+    // OPTIONAL: Override the WSDL in the version adapters
+    // OPTIONAL: Any Psr\Cache\CacheItemPoolInterface cache
 );
 
 ```

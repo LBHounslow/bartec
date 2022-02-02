@@ -2,6 +2,9 @@
 
 namespace LBHounslow\Bartec\Service;
 
+use LBHounslow\Bartec\Adapter\ApiVersionAdapterInterface;
+use LBHounslow\Bartec\Adapter\Version15Adapter;
+use LBHounslow\Bartec\Adapter\Version16Adapter;
 use LBHounslow\Bartec\Client\Client as BartecClient;
 use LBHounslow\Bartec\Enum\BartecServiceEnum;
 use LBHounslow\Bartec\Exception\SoapException;
@@ -19,10 +22,15 @@ class BartecService
     const CACHE_LIFETIME = 3600; // 1 hour
     const CACHE_NAMESPACE = 'lb-hounslow/bartec';
 
+    const VERSION_ADAPTERS = [
+        Version15Adapter::VERSION => Version15Adapter::class,
+        Version16Adapter::VERSION => Version16Adapter::class
+    ];
+
     /**
-     * @var BartecClient
+     * @var ApiVersionAdapterInterface
      */
-    protected $client;
+    protected $apiVersionAdapter;
 
     /**
      * @var CacheItemPoolInterface|null
@@ -30,13 +38,37 @@ class BartecService
     protected $cache;
 
     /**
-     * @param BartecClient $client
+     * @param BartecClient $bartecClient
+     * @param string $version
+     * @param string $WSDL // Override for Collective WSDL
      * @param CacheItemPoolInterface|null $cache
      */
-    public function __construct(BartecClient $client, CacheItemPoolInterface $cache = null)
-    {
-        $this->client = $client;
+    public function __construct(
+        BartecClient $bartecClient,
+        string $version,
+        $WSDL = '',
+        CacheItemPoolInterface $cache = null
+    ) {
+        $this->apiVersionAdapter = $this->factoryApiVersionAdapter($bartecClient, $version, $WSDL);
         $this->cache = $cache;
+    }
+
+    /**
+     * @param BartecClient $bartecClient
+     * @param string $version
+     * @param string $WSDL
+     * @return ApiVersionAdapterInterface
+     * @throws \InvalidArgumentException
+     */
+    public function factoryApiVersionAdapter(BartecClient $bartecClient, string $version, string $WSDL)
+    {
+        if (!in_array($version, array_keys(self::VERSION_ADAPTERS))) {
+            throw new \InvalidArgumentException(sprintf("Version '%s' is not supported", $version));
+        }
+
+        $versionAdapterClass = self::VERSION_ADAPTERS[$version];
+
+        return new $versionAdapterClass($bartecClient, $WSDL);
     }
 
     /**
@@ -44,7 +76,7 @@ class BartecService
      */
     public function getClient()
     {
-        return $this->client;
+        return $this->apiVersionAdapter->getBartecClient();
     }
 
     /**
@@ -53,7 +85,8 @@ class BartecService
      */
     public function setClientSoapOptions(array $soapOptions)
     {
-        $this->client->setSoapOptions($soapOptions);
+        $this->apiVersionAdapter->getBartecClient()
+            ->setSoapOptions($soapOptions);
         return $this;
     }
 
@@ -64,10 +97,8 @@ class BartecService
      */
     public function createServiceRequest(array $data)
     {
-        $response = $this->client->call(
-            'ServiceRequests_Create',
-            $data
-        );
+        $response = $this->apiVersionAdapter
+            ->createServiceRequest($data);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -79,20 +110,13 @@ class BartecService
     /**
      * @param string $serviceRequestCode
      * @param array $data
-     * @return \stdClass|null
+     * @return mixed|null
      * @throws SoapException
      */
     public function updateServiceRequest(string $serviceRequestCode, array $data)
     {
-        $data['serviceCode'] = $serviceRequestCode;
-        if (empty($data['serviceLocationDescription'])) { // workaround for issue in Bartec API
-            $data['serviceLocationDescription'] = '';
-        }
-
-        $response = $this->client->call(
-            'ServiceRequests_Update',
-            $data
-        );
+        $response = $this->apiVersionAdapter
+            ->updateServiceRequest($serviceRequestCode, $data);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -115,17 +139,13 @@ class BartecService
         string $maximumDate,
         int $serviceTypeId
     ) {
-        $response = $this->client->call(
-            'ServiceRequests_Get',
-            [
-                'UPRNs' => ['decimal' => $UPRN],
-                'RequestDate' => [
-                    'MinimumDate' => $minimumDate,
-                    'MaximumDate' => $maximumDate,
-                ],
-                'ServiceTypes' => ['int' => $serviceTypeId],
-            ]
-        );
+        $response = $this->apiVersionAdapter
+            ->getServiceRequests(
+                $UPRN,
+                $minimumDate,
+                $maximumDate,
+                $serviceTypeId
+            );
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -141,10 +161,8 @@ class BartecService
      */
     public function getServiceRequestDetail(string $ServiceRequestCode)
     {
-        $response = $this->client->call(
-            'ServiceRequests_Detail_Get',
-            ['ServiceCode' => $ServiceRequestCode]
-        );
+        $response = $this->apiVersionAdapter
+            ->getServiceRequestDetail($ServiceRequestCode);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -162,14 +180,8 @@ class BartecService
     public function setServiceRequestStatus(\stdClass $ServiceRequest, \stdClass $ServiceRequestStatus)
     {
         /** @var Response $response */
-        $response = $this->client->call(
-            'ServiceRequests_Status_Set',
-            [
-                'ServiceCode' => $ServiceRequest->ServiceCode,
-                'StatusID' => $ServiceRequestStatus->ID,
-                'Comments' => BartecServiceEnum::DEFAULT_NOTE_COMMENT,
-            ]
-        );
+        $response = $this->apiVersionAdapter
+            ->setServiceRequestStatus($ServiceRequest, $ServiceRequestStatus);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -195,17 +207,14 @@ class BartecService
         $comment = ''
     ) {
         /** @var Response $response */
-        $response = $this->client->call(
-            'ServiceRequests_Notes_Create',
-            [
-                'ServiceRequestID' => $ServiceRequestID,
-                'ServiceCode' => null,
-                'NoteTypeID' => $noteTypeID,
-                'Note' => $note,
-                'Comment' => $comment,
-                'SequenceNumber' => $sequenceNumber
-            ]
-        );
+        $response = $this->apiVersionAdapter
+            ->createServiceRequestNote(
+                $ServiceRequestID,
+                $note,
+                $noteTypeID,
+                $sequenceNumber,
+                $comment
+            );
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -230,7 +239,8 @@ class BartecService
 
             if (!$cacheItem->isHit()) {
                 /** @var Response $response */
-                $response = $this->client->call('ServiceRequests_Classes_Get');
+                $response = $this->apiVersionAdapter
+                    ->getServiceRequestClasses();
 
                 if ($response->hasErrors()) {
                     throw new SoapException($response);
@@ -246,7 +256,8 @@ class BartecService
             $response = $cacheItem->get();
         } else {
             /** @var Response $response */
-            $response = $this->client->call('ServiceRequests_Classes_Get');
+            $response = $this->apiVersionAdapter
+                ->getServiceRequestClasses();
 
             if ($response->hasErrors()) {
                 throw new SoapException($response);
@@ -272,7 +283,8 @@ class BartecService
 
             if (!$cacheItem->isHit()) {
                 /** @var Response $response */
-                $response = $this->client->call('ServiceRequests_Types_Get');
+                $response = $this->apiVersionAdapter
+                    ->getServiceRequestTypes();
 
                 if ($response->hasErrors()) {
                     throw new SoapException($response);
@@ -288,7 +300,8 @@ class BartecService
             $response = $cacheItem->get();
         } else {
             /** @var Response $response */
-            $response = $this->client->call('ServiceRequests_Types_Get');
+            $response = $this->apiVersionAdapter
+                ->getServiceRequestTypes();
 
             if ($response->hasErrors()) {
                 throw new SoapException($response);
@@ -315,10 +328,8 @@ class BartecService
 
             if (!$cacheItem->isHit()) {
                 /** @var Response $response */
-                $response = $this->client->call(
-                    'ServiceRequests_Types_Get',
-                    ['ServiceRequestClass' => $serviceRequestClassId]
-                );
+                $response = $this->apiVersionAdapter
+                    ->getServiceRequestTypesByServiceRequestClassId($serviceRequestClassId);
 
                 if ($response->hasErrors()) {
                     throw new SoapException($response);
@@ -334,10 +345,8 @@ class BartecService
             $response = $cacheItem->get();
         } else {
             /** @var Response $response */
-            $response = $this->client->call(
-                'ServiceRequests_Types_Get',
-                ['ServiceRequestClass' => $serviceRequestClassId]
-            );
+            $response = $this->apiVersionAdapter
+                ->getServiceRequestTypesByServiceRequestClassId($serviceRequestClassId);
 
             if ($response->hasErrors()) {
                 throw new SoapException($response);
@@ -418,10 +427,8 @@ class BartecService
     public function getServiceRequestStatusForServiceTypeIdByStatus(int $ServiceTypeID, string $status)
     {
         /** @var Response $response */
-        $response = $this->client->call(
-            'ServiceRequests_Statuses_Get',
-            ['ServiceTypeID' => $ServiceTypeID]
-        );
+        $response = $this->apiVersionAdapter
+            ->getServiceRequestStatusForServiceTypeIdByStatus($ServiceTypeID);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -443,7 +450,8 @@ class BartecService
     public function getServiceNoteTypeFromNoteTypeDescription(string $noteTypeDescription)
     {
         /** @var Response $response */
-        $response = $this->client->call('ServiceRequests_Notes_Types_Get');
+        $response = $this->apiVersionAdapter
+            ->getServiceNoteTypeFromNoteTypeDescription();
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -465,7 +473,8 @@ class BartecService
     public function createServiceRequestDocument(array $data)
     {
         /** @var Response $response */
-        $response = $this->client->call('Service_Request_Document_Create', $data);
+        $response = $this->apiVersionAdapter
+            ->createServiceRequestDocument($data);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -480,10 +489,9 @@ class BartecService
      */
     public function getPremisesByUPRN(string $UPRN)
     {
-        $response = $this->client->call(
-            'Premises_Get',
-            ['UPRN' => $UPRN]
-        );
+        /** @var Response $response */
+        $response = $this->apiVersionAdapter
+            ->getPremisesByUPRN($UPRN);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -499,10 +507,9 @@ class BartecService
      */
     public function getPremisesDetailByUPRN(string $UPRN)
     {
-        $response = $this->client->call(
-            'Premises_Detail_Get',
-            ['UPRN' => $UPRN]
-        );
+        /** @var Response $response */
+        $response = $this->apiVersionAdapter
+            ->getPremisesDetailByUPRN($UPRN);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -518,10 +525,9 @@ class BartecService
      */
     public function getPremisesAttributes(string $UPRN)
     {
-        $response = $this->client->call(
-            'Premises_Attributes_Get',
-            ['UPRN' => $UPRN]
-        );
+        /** @var Response $response */
+        $response = $this->apiVersionAdapter
+            ->getPremisesAttributes($UPRN);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -637,7 +643,7 @@ class BartecService
             if (!$cacheItem->isHit()) {
 
                 /** @var Response $response */
-                $response = $this->client->call('Crews_Get');
+                $response = $this->apiVersionAdapter->getCrews();
 
                 if ($response->hasErrors()) {
                     throw new SoapException($response);
@@ -653,7 +659,7 @@ class BartecService
             $response = $cacheItem->get();
         } else {
             /** @var Response $response */
-            $response = $this->client->call('Crews_Get');
+            $response = $this->apiVersionAdapter->getCrews();
 
             if ($response->hasErrors()) {
                 throw new SoapException($response);
@@ -687,7 +693,8 @@ class BartecService
             if (!$cacheItem->isHit()) {
 
                 /** @var Response $response */
-                $response = $this->client->call('ServiceRequests_SLAs_Get');
+                $response = $this->apiVersionAdapter
+                    ->getServiceRequestSLAs();
 
                 if ($response->hasErrors()) {
                     throw new SoapException($response);
@@ -703,7 +710,8 @@ class BartecService
             $response = $cacheItem->get();
         } else {
             /** @var Response $response */
-            $response = $this->client->call('ServiceRequests_SLAs_Get');
+            $response = $this->apiVersionAdapter
+                ->getServiceRequestSLAs();
 
             if ($response->hasErrors()) {
                 throw new SoapException($response);
@@ -737,7 +745,8 @@ class BartecService
             if (!$cacheItem->isHit()) {
 
                 /** @var Response $response */
-                $response = $this->client->call('System_LandTypes_Get');
+                $response = $this->apiVersionAdapter
+                    ->getServiceLandTypes();
 
                 if ($response->hasErrors()) {
                     throw new SoapException($response);
@@ -753,7 +762,8 @@ class BartecService
             $response = $cacheItem->get();
         } else {
             /** @var Response $response */
-            $response = $this->client->call('System_LandTypes_Get');
+            $response = $this->apiVersionAdapter
+                ->getServiceLandTypes();
 
             if ($response->hasErrors()) {
                 throw new SoapException($response);
@@ -785,24 +795,15 @@ class BartecService
         bool $includeRelated = true,
         $workPackID = null
     ) {
-        $data = [
-            'UPRN' => $UPRN,
-            'WorkPackID' => $workPackID,
-            'ScheduleStart' => [
-                'MinimumDate' => $minimumDate,
-                'MaximumDate' => $maximumDate,
-            ],
-            'IncludeRelated' => ''
-        ];
-
-        if ($includeRelated) {
-            $data['IncludeRelated'] = 1;
-        }
-
-        $response = $this->client->call(
-            'Jobs_Get',
-            $data
-        );
+        /** @var Response $response */
+        $response = $this->apiVersionAdapter
+            ->getJobs(
+                $UPRN,
+                $minimumDate,
+                $maximumDate,
+                $includeRelated,
+                $workPackID
+            );
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -817,10 +818,10 @@ class BartecService
      * @throws SoapException
      */
     public function getJobDetail(int $jobId) {
-        $response = $this->client->call(
-            'Jobs_Detail_Get',
-            ['jobID' => $jobId]
-        );
+
+        /** @var Response $response */
+        $response = $this->apiVersionAdapter
+            ->getJobDetail($jobId);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -845,28 +846,15 @@ class BartecService
         bool $includeRelated = true,
         $workpack = null
     ) {
-        $data = [
-            'UPRN' => $UPRN,
-            'WorkPack' => $workpack,
-            'IncludeRelated' => ''
-        ];
-
-        if ($minimumDate) {
-            $data['DateRange']['MinimumDate'] = $minimumDate;
-        }
-
-        if ($maximumDate) {
-            $data['DateRange']['MaximumDate'] = $maximumDate;
-        }
-
-        if ($includeRelated) {
-            $data['IncludeRelated'] = 1;
-        }
-
-        $response = $this->client->call(
-            'Premises_Events_Get',
-            $data
-        );
+        /** @var Response $response */
+        $response = $this->apiVersionAdapter
+            ->getEventsByUPRN(
+                $UPRN,
+                $minimumDate,
+                $maximumDate,
+                $includeRelated,
+                $workpack
+            );
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -908,25 +896,9 @@ class BartecService
      */
     public function getFeatures(string $UPRN, bool $includeRelated = true)
     {
-        $data = [
-            'UPRN' => $UPRN,
-            'IncludeRelated' => '',
-            'Types' => '',
-            'Statuses' => '',
-            'Manufacturers' => '',
-            'Colours' => '',
-            'Conditions' => '',
-            'WasteTypes' => ''
-        ];
-
-        if ($includeRelated) {
-            $data['IncludeRelated'] = 1;
-        }
-
-        $response = $this->client->call(
-            'Features_Get',
-            $data
-        );
+        /** @var Response $response */
+        $response = $this->apiVersionAdapter
+            ->getFeatures($UPRN, $includeRelated);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -941,9 +913,9 @@ class BartecService
      */
     public function getFeatureTypes()
     {
-        $response = $this->client->call(
-            'Features_Types_Get'
-        );
+        /** @var Response $response */
+        $response = $this->apiVersionAdapter
+            ->getFeatureTypes();
 
         if ($response->hasErrors()) {
             throw new SoapException($response);
@@ -959,10 +931,9 @@ class BartecService
      */
     public function getFeatureSchedules(string $UPRN)
     {
-        $response = $this->client->call(
-            'Features_Schedules_Get',
-            ['UPRN' => $UPRN, 'Types' => '']
-        );
+        /** @var Response $response */
+        $response = $this->apiVersionAdapter
+            ->getFeatureSchedules($UPRN);
 
         if ($response->hasErrors()) {
             throw new SoapException($response);

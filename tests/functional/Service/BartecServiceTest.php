@@ -2,6 +2,7 @@
 
 namespace Tests\Functional\Service;
 
+use LBHounslow\Bartec\Adapter\Version16Adapter;
 use LBHounslow\Bartec\Client\Client as BartecClient;
 use LBHounslow\Bartec\Client\SoapClient;
 use LBHounslow\Bartec\Enum\BartecServiceEnum;
@@ -13,6 +14,12 @@ use Tests\Functional\BartecTestCase;
 
 class BartecServiceTest extends BartecTestCase
 {
+    // UPDATE THESE PRIOR TO TESTING
+    const API_VERSION = Version16Adapter::VERSION; // v16
+    const COLLECTIVE_WSDL = Version16Adapter::WSDL_COLLECTIVE_API; // v16
+    const BARTEC_USERNAME = 'BARTEC_API_USERNAME';
+    const BARTEC_PASSWORD = 'BARTEC_API_PASSWORD';
+
     /**
      * @var BartecService
      */
@@ -20,17 +27,70 @@ class BartecServiceTest extends BartecTestCase
 
     public function setUp(): void
     {
-        $this->bartecService = new BartecService(
+        if (!$this->bartecService) {
+            $this->bartecService = new BartecService(
+                new BartecClient(
+                    new SoapClient(BartecClient::WSDL_AUTH),
+                    new SoapClient(self::COLLECTIVE_WSDL),
+                    self::BARTEC_USERNAME,
+                    self::BARTEC_PASSWORD,
+                    ['trace' => 1]
+                ),
+                self::API_VERSION
+                // no WSDL override required
+                // no cache required for tests
+            );
+        }
+
+        parent::setUp();
+    }
+
+    public function testThatGetClientReturnsBartecClient()
+    {
+        $result = $this->bartecService->getClient();
+        $this->assertInstanceOf(BartecClient::class, $result);
+    }
+
+    public function testThatSetClientSoapOptionsStoresSoapOptionsInClient()
+    {
+        $soapOptions = [
+            'uri' => 'https://test.url',
+            'trace' => 1,
+            'connection_timeout' => 20
+        ];
+
+        $this->bartecService->setClientSoapOptions($soapOptions);
+
+        $authSoapClientOptions = $this->bartecService->getClient()->getCollectiveSoapClient()->getOptions();
+        $collectiveSoapClientOptions = $this->bartecService->getClient()->getCollectiveSoapClient()->getOptions();
+
+        $this->assertEquals($soapOptions, $authSoapClientOptions);
+        $this->assertEquals($soapOptions, $collectiveSoapClientOptions);
+    }
+
+    public function testThatBartecServiceSetsCorrectWsdlInCollectiveSoapClient()
+    {
+        $result = $this->bartecService->getClient()->getCollectiveSoapClient()->getWsdl();
+        $this->assertEquals(self::COLLECTIVE_WSDL, $result);
+    }
+
+    public function testThatCustomWsdlPassedIntoBartecServiceCanOverrideDefaultVersionAdapterWsdl()
+    {
+        $bartecService = new BartecService(
             new BartecClient(
                 new SoapClient(BartecClient::WSDL_AUTH),
-                new SoapClient(BartecClient::WSDL_COLLECTIVE_API_V15),
-                'BARTEC_API_USERNAME',
-                'BARTEC_API_PASSWORD',
+                new SoapClient(self::COLLECTIVE_WSDL),
+                self::BARTEC_USERNAME,
+                self::BARTEC_PASSWORD,
                 ['trace' => 1]
-            )
-            // no cache passed for testing
+            ),
+            self::API_VERSION,
+        'https://testing.custom?WSDL' // <--------
+        // no cache required for tests
         );
-        parent::setUp();
+
+        $result = $bartecService->getClient()->getCollectiveSoapClient()->getWsdl();
+        $this->assertEquals('https://testing.custom?WSDL', $result);
     }
 
     public function testItGetsServiceRequestClasses()
@@ -300,62 +360,6 @@ class BartecServiceTest extends BartecTestCase
         $this->assertEquals($file->getFilename(), $ServiceRequestDetail->ServiceRequest->AttachedDocuments->AttachedDocument->DocumentName);
     }
 
-    public function createServiceRequestDataProvider()
-    {
-        $this->setUp();
-
-        /** @var \stdClass|null $ServiceRequestClass */
-        $ServiceRequestClass = $this->bartecService->getServiceRequestClassFromServiceRequestClassName(BartecServiceEnum::SERVICE_REQUEST_CLASS_NAME_GARDEN_WASTE);
-
-        /** @var \stdClass|null $ServiceRequestType */
-        $ServiceRequestType = $this->bartecService->getServiceRequestTypeFromServiceRequestClassIdAndServiceRequestTypeName(
-            $ServiceRequestClass->ID,
-            BartecServiceEnum::SERVICE_REQUEST_TYPE_NAME_SUBSCRIPTION
-        );
-
-        /** @var \stdClass|null $ServiceRequestStatus */
-        $ServiceRequestStatus = $this->bartecService->getServiceRequestStatusForServiceTypeIdByStatus(
-            $ServiceRequestType->ID,
-            BartecServiceEnum::STATUS_PENDING
-        );
-
-        return [
-            [
-                [
-                    'UPRN' => self::RESIDENTIAL_UPRN,
-                    'ServiceRequest_Location' => '',
-                    'serviceLocationDescription' => '',
-                    'DateRequested' => (new \DateTimeImmutable())->format(DateEnum::ISO8601_NO_TIMEZONE),
-                    'ServiceTypeID' => $ServiceRequestType->ID,
-                    'ServiceStatusID' => $ServiceRequestStatus->ID,
-                    'reporterContact' => [
-                        'Title' => self::REPORTER_TITLE,
-                        'Forename' => self::REPORTER_FORENAME,
-                        'OtherNames' => self::REPORTER_OTHERNAMES,
-                        'Surname' => self::REPORTER_SURNAME,
-                        'Email' => self::REPORTER_EMAIL,
-                        'Telephone' => self::REPORTER_TELEPHONE,
-                        'SpecialCommunicationNeeds' => self::REPORTER_SPECIAL_COMMUNICATION_NEEDS,
-                        'ExternalReference' => self::REPORTER_EXTERNAL_REFERENCE,
-                        'ReporterType' => BartecServiceEnum::REPORTER_TYPE_PUBLIC
-                    ],
-                    'reporterBusiness' => '',
-                    'source' => BartecServiceEnum::DEFAULT_SERVICE_REQUEST_SOURCE,
-                    'ExternalReference' => self::REPORTER_EXTERNAL_REFERENCE,
-                    'LandTypeID' => $ServiceRequestType->DefaultLandType->ID,
-                    'SLAID' => $ServiceRequestType->DefaultSLA->ID,
-                    'CrewID' => $ServiceRequestType->DefaultCrew->ID,
-                    'extendedData' => [
-                        'ServiceRequests_CreateServiceRequests_CreateFields' => self::GARDEN_WASTE_SUBSCRIPTION_EXTENDED_DATA
-                    ],
-                    'relatedServiceRequests' => '',
-                    'relatedPremises' => '',
-                ],
-                $ServiceRequestType
-            ]
-        ];
-    }
-
     public function testItGetsServiceRequestsForUPRNDateRangeAndServiceTypeID()
     {
         $minimumDate = date(DateEnum::Y_m_d, strtotime(DateEnum::YESTERDAY));
@@ -623,5 +627,61 @@ class BartecServiceTest extends BartecTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->bartecService->validateWasteContainerFeatureTypeNames(['Invalid']);
+    }
+
+    public function createServiceRequestDataProvider()
+    {
+        $this->setUp();
+
+        /** @var \stdClass|null $ServiceRequestClass */
+        $ServiceRequestClass = $this->bartecService->getServiceRequestClassFromServiceRequestClassName(BartecServiceEnum::SERVICE_REQUEST_CLASS_NAME_GARDEN_WASTE);
+
+        /** @var \stdClass|null $ServiceRequestType */
+        $ServiceRequestType = $this->bartecService->getServiceRequestTypeFromServiceRequestClassIdAndServiceRequestTypeName(
+            $ServiceRequestClass->ID,
+            BartecServiceEnum::SERVICE_REQUEST_TYPE_NAME_SUBSCRIPTION
+        );
+
+        /** @var \stdClass|null $ServiceRequestStatus */
+        $ServiceRequestStatus = $this->bartecService->getServiceRequestStatusForServiceTypeIdByStatus(
+            $ServiceRequestType->ID,
+            BartecServiceEnum::STATUS_PENDING
+        );
+
+        return [
+            [
+                [
+                    'UPRN' => self::RESIDENTIAL_UPRN,
+                    'ServiceRequest_Location' => '',
+                    'serviceLocationDescription' => '',
+                    'DateRequested' => (new \DateTimeImmutable())->format(DateEnum::ISO8601_NO_TIMEZONE),
+                    'ServiceTypeID' => $ServiceRequestType->ID,
+                    'ServiceStatusID' => $ServiceRequestStatus->ID,
+                    'reporterContact' => [
+                        'Title' => self::REPORTER_TITLE,
+                        'Forename' => self::REPORTER_FORENAME,
+                        'OtherNames' => self::REPORTER_OTHERNAMES,
+                        'Surname' => self::REPORTER_SURNAME,
+                        'Email' => self::REPORTER_EMAIL,
+                        'Telephone' => self::REPORTER_TELEPHONE,
+                        'SpecialCommunicationNeeds' => self::REPORTER_SPECIAL_COMMUNICATION_NEEDS,
+                        'ExternalReference' => self::REPORTER_EXTERNAL_REFERENCE,
+                        'ReporterType' => BartecServiceEnum::REPORTER_TYPE_PUBLIC
+                    ],
+                    'reporterBusiness' => '',
+                    'source' => BartecServiceEnum::DEFAULT_SERVICE_REQUEST_SOURCE,
+                    'ExternalReference' => self::REPORTER_EXTERNAL_REFERENCE,
+                    'LandTypeID' => $ServiceRequestType->DefaultLandType->ID,
+                    'SLAID' => $ServiceRequestType->DefaultSLA->ID,
+                    'CrewID' => $ServiceRequestType->DefaultCrew->ID,
+                    'extendedData' => [
+                        'ServiceRequests_CreateServiceRequests_CreateFields' => self::GARDEN_WASTE_SUBSCRIPTION_EXTENDED_DATA
+                    ],
+                    'relatedServiceRequests' => '',
+                    'relatedPremises' => '',
+                ],
+                $ServiceRequestType
+            ]
+        ];
     }
 }
