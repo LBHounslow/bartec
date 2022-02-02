@@ -35,6 +35,29 @@ class BartecServiceTest extends BartecTestCase
         parent::setUp();
     }
 
+    public function testThatGetClientReturnsBartecClient()
+    {
+        $result = $this->bartecService->getClient();
+        $this->assertInstanceOf(BartecClient::class, $result);
+    }
+
+    public function testThatSetClientSoapOptionsStoresSoapOptionsInClient()
+    {
+        $soapOptions = [
+            'uri' => 'https://test.url',
+            'trace' => 1,
+            'connection_timeout' => 20
+        ];
+
+        $this->bartecService->setClientSoapOptions($soapOptions);
+
+        $authSoapClientOptions = $this->bartecService->getClient()->getCollectiveSoapClient()->getOptions();
+        $collectiveSoapClientOptions = $this->bartecService->getClient()->getCollectiveSoapClient()->getOptions();
+
+        $this->assertEquals($soapOptions, $authSoapClientOptions);
+        $this->assertEquals($soapOptions, $collectiveSoapClientOptions);
+    }
+
     public function testItGetsServiceRequestClasses()
     {
         /** @var Response $response */
