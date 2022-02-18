@@ -2,6 +2,13 @@
 
 ## Changelog
 
+### Release v1.9.1 `18/02/2022`
+
+This release includes a fix for the `Jobs_Detail_Get` Collective API method.
+
+- Fixed bug in `AbstractApiVersionAdapter.getJobDetail` call.
+- Added functional test coverage for this method.
+
 ### Release v1.9 `02/02/2022`
 
 This release is in preparation for Hounslow switching from Bartec Collective v15 to v16.

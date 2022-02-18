@@ -524,6 +524,14 @@ class BartecServiceTest extends BartecTestCase
         $this->assertEquals(0, $result->Errors->Result);
     }
 
+    public function testThatGetJobDetailReturnsJob()
+    {
+        $result = $this->bartecService->getJobDetail(self::JOB_ID);
+        $this->assertTrue(isset($result->Job->ID));
+        $this->assertEquals(self::JOB_ID, $result->Job->ID);
+        $this->assertEquals(1, $result->RecordCount);
+    }
+
     public function testGetsEventsByUPRN()
     {
         $minimumDate = date(DateEnum::Y_m_d, strtotime(DateEnum::YESTERDAY));

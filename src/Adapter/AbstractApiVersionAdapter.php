@@ -237,7 +237,7 @@ abstract class AbstractApiVersionAdapter implements ApiVersionAdapterInterface
     {
         return $this->bartecClient->call(
             'Jobs_Detail_Get',
-            ['jobID' => $jobId]
+            ['JobID' => $jobId]
         );
     }
 

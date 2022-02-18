@@ -19,6 +19,9 @@ abstract class BartecTestCase extends TestCase
 
     const RESIDENTIAL_UPRN = '100021529122'; // 1 Oaks Avenue, Feltham, TW13 5JD
 
+    // If you need a job ID, in the Bartec Software go to Work Packs then click on any Job Name and grab the ID
+    const JOB_ID = 210143649;
+
     const GARDEN_WASTE_SUBSCRIPTION_EXTENDED_DATA = [
         [
             'FieldName' => 'SackOrBin',
