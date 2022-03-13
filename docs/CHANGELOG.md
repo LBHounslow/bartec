@@ -2,6 +2,12 @@
 
 ## Changelog
 
+### Release v2.0 `13/03/2022`
+
+This release includes:
+
+[APID-76](https://hounslow.atlassian.net/browse/APID-76) - Added Feature Type Name to Extended Data Field Mapping for Report a Missed Bin 2022
+
 ### Release v1.9.1 `18/02/2022`
 
 This release includes a fix for the `Jobs_Detail_Get` Collective API method.
