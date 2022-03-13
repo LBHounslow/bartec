@@ -36,29 +36,75 @@ class BartecServiceEnum
     const EVENT_RECYCLING_OLD_BOX_NOT_SORTED = 'REC - OLD BOX UNSORT';
     const EVENT_CONTAMINATED_FOOD_BIN = 'CONTAM FOOD BIN';
 
+    const EXTENDED_DATA_FIELD_BULK_BIN_RECYCLING = 'Bulk Bin recycling';
+    const EXTENDED_DATA_FIELD_BULK_BIN_REFUSE = 'Bulk Bin refuse';
+    const EXTENDED_DATA_FIELD_FOOD_WASTE = 'Food Waste';
+    const EXTENDED_DATA_FIELD_FLATS_ABOVE_SHOPS_REFUSE_SACK_COLLECTION = 'Flats above shops Refuse Sack Collection';
+    const EXTENDED_DATA_FIELD_FLATS_ABOVE_SHOPS_RECYCLING_SACK_COLLECTION = 'Flats above shops recycling Sack Collection';
+    const EXTENDED_DATA_FIELD_GARDEN_WASTE_COLLECTION = 'Garden waste collection';
+    const EXTENDED_DATA_FIELD_HOUSEHOLD_REFUSE_SACK_COLLECTION = 'Household refuse sack collection';
+    const EXTENDED_DATA_FIELD_RECYCLING_BOX_COLLECTION = 'Recycling Box collection';
+    const EXTENDED_DATA_WHEELED_BIN_REFUSE_COLLECTION = 'Wheeled Bin refuse collection';
+
     const FEATURE_CATEGORY_WASTE_CONTAINER = 'WASTE CONTAINER';
-    const FEATURE_RESIDUAL_SACK = 'ResidualSack';
-    const FEATURE_RESIDUAL_140 = 'Residual140';
-    const FEATURE_RESIDUAL_240 = 'Residual240';
+
+    // Feature Type Names
     const FEATURE_RECYCLING_RED = 'RecyclingRed';
     const FEATURE_RECYCLING_GREEN = 'RecyclingGreen';
     const FEATURE_RECYCLING_BLUE = 'RecyclingBlue';
-    const FEATURE_CARDBOARD_1280 = 'Cardboard1280';
-    const FEATURE_PLASTIC_1280 = 'Plastic1280';
-    const FEATURE_GARDEN_240 = 'Garden240';
-    const FEATURE_GARDENSACK = 'GardenSack';
-    const FEATURE_RESIDUAL_1100 = 'Residual1100';
-    const FEATURE_RESIDUAL_360 = 'Residual360';
-    const FEATURE_RESIDUAL_660 = 'Residual660';
-    const FEATURE_RESIDUAL_940 = 'Residual940';
-    const FEATURE_RECYCLING_SACK = 'RecyclingSack';
-    const FEATURE_RESIDUAL_PURPLE_SACK = 'ResidualPurpleSack';
-    const FEATURE_RECYCLING_1280 = 'Recycling1280';
+    const FEATURE_CANS_140 = 'Cans 140L';
+    const FEATURE_CANS_240 = 'Cans240';
+    const FEATURE_CANS_360 = 'Cans 360L';
+    const FEATURE_CANS_660 = 'Cans 660L';
+    const FEATURE_CANS_1100 = 'Cans1100L';
+    const FEATURE_CARDBOARD_140 = 'Cardboard140';
     const FEATURE_CARDBOARD_240 = 'Cardboard240';
-    const FEATURE_PLASTIC_240 = 'Plastic240';
+    const FEATURE_CARDBOARD_360 = 'Cardboard360L';
+    const FEATURE_CARDBOARD_660 = 'Cardboard660L';
+    const FEATURE_CARDBOARD_1100 = 'Cardboard1100L';
+    const FEATURE_CARDBOARD_1280 = 'Cardboard1280';
+    const FEATURE_ELECTRONIC_WASTE = 'Electronic Waste';
     const FEATURE_FOOD_23 = 'Food23';
     const FEATURE_FOOD_140 = 'Food140';
     const FEATURE_FOOD_240 = 'Food240';
+    const FEATURE_GARDEN_240 = 'Garden240';
+    const FEATURE_GARDENSACK = 'GardenSack';
+    const FEATURE_GLASS_140 = 'Glass 140L';
+    const FEATURE_GLASS_240 = 'Glass240';
+    const FEATURE_GLASS_360 = 'Glass 360L';
+    const FEATURE_GLASS_660 = 'Glass 660L';
+    const FEATURE_GLASS_1280 = 'Glass1280';
+    const FEATURE_PAPER_140 = 'Paper 140L';
+    const FEATURE_PAPER_240 = 'Paper 240L';
+    const FEATURE_PAPER_360 = 'Paper 360L';
+    const FEATURE_PAPER_660 = 'Paper 660L';
+    const FEATURE_PAPER_CARD_1280= 'PaperCard1280';
+    const FEATURE_PLASTIC_140 = 'Plastic 140L';
+    const FEATURE_PLASTIC_240 = 'Plastic 240L';
+    const FEATURE_PLASTIC_360 = 'Plastic 360L';
+    const FEATURE_PLASTIC_660 = 'Plastic 660L';
+    const FEATURE_PLASTIC_1100 = 'Plastic 1100L';
+    const FEATURE_PLASTIC_1280 = 'Plastic1280';
+    const FEATURE_PLASTIC_CANS_1280 = 'PlasticCans1280';
+    const FEATURE_RESIDUAL_140 = 'Residual140';
+    const FEATURE_RESIDUAL_140_FAS = 'Residual140 FAS';
+    const FEATURE_RESIDUAL_240 = 'Residual240';
+    const FEATURE_RESIDUAL_240_FAS = 'Residual240 FAS';
+    const FEATURE_RESIDUAL_360 = 'Residual360';
+    const FEATURE_RESIDUAL_360_FAS = 'Residual360 FAS';
+    const FEATURE_RESIDUAL_660 = 'Residual660';
+    const FEATURE_RESIDUAL_660_FAS = 'Residual660 FAS';
+    const FEATURE_RESIDUAL_940 = 'Residual940';
+    const FEATURE_RESIDUAL_1100 = 'Residual1100';
+    const FEATURE_RESIDUAL_1100_FAS = 'Residual1100 FAS';
+    const FEATURE_PURPLE_RESIDUAL_1100 = 'Purple Residual 1100L';
+    const FEATURE_RESIDUAL_SACK = 'ResidualSack';
+    const FEATURE_RECYCLING_SACK = 'RecyclingSack';
+    const FEATURE_RECYCLING_CLEAR_SACK = 'RecyclingClearSack';
+    const FEATURE_RESIDUAL_PURPLE_SACK = 'ResidualPurpleSack';
+    const FEATURE_RECYCLING_240 = 'Recycling240';
+    const FEATURE_RECYCLING_1280 = 'Recycling1280';
+    const FEATURE_TEXTILES = 'Textiles';
 
     const FEATURE_STATE_IN_SERVICE = 'IN SERVICE';
     const FEATURE_STATE_OUT_OF_SERVICE = 'OUT OF SERVICE';
@@ -83,6 +129,13 @@ class BartecServiceEnum
     const RESIDUAL = 'Residual';
 
     const SACKS = 'Sacks';
+
+    const SERVICE_TYPE_CARDBOARD = 'Cardboard';
+    const SERVICE_TYPE_FOOD = 'Food';
+    const SERVICE_TYPE_GARDEN = 'Garden';
+    const SERVICE_TYPE_PLASTIC = 'Plastic';
+    const SERVICE_TYPE_RECYCLING = 'Recycling';
+    const SERVICE_TYPE_RESIDUAL = 'Residual';
 
     const SERVICE_NOTE_DESCRIPTION_GENERAL_NOTE = 'General Note';
     const SERVICE_REQUEST_CODE_PREFIX = 'SR';
