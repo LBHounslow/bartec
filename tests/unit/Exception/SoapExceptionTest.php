@@ -8,11 +8,6 @@ use Tests\Unit\BartecTestCase;
 
 class SoapExceptionTest extends BartecTestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     /**
      * @param Response $response
      * @param string $expectedMessage
