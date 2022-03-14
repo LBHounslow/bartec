@@ -2,6 +2,10 @@
 
 ## Changelog
 
+### Release v2.1 `14/03/2022`
+
+Added all extended data fields for Report Missed Bin to `BartecServiceEnum` (taken from `System_ExtendedDataDefinitions_Get` method)
+
 ### Release v2.0 `13/03/2022`
 
 This release includes:
