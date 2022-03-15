@@ -60,7 +60,7 @@ class FeatureTypeNameToExtendedDataFieldTransformer implements TransformerInterf
             case BartecServiceEnum::FEATURE_RESIDUAL_140:
             case BartecServiceEnum::FEATURE_RESIDUAL_240:
             case BartecServiceEnum::FEATURE_RESIDUAL_360:
-                return BartecServiceEnum::EXTENDED_DATA_WHEELED_BIN_REFUSE_COLLECTION;
+                return BartecServiceEnum::EXTENDED_DATA_FIELD_WHEELED_BIN_REFUSE_COLLECTION;
 
             case BartecServiceEnum::FEATURE_RESIDUAL_660:
             case BartecServiceEnum::FEATURE_RESIDUAL_1100:
